@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styling.css">
+    <title>Document</title>
+
+</head>
+<header class="main-header">
+    <div class="header-section-1">
+        <a href="http://wwww.qien.nl">
+            <img src="https://www.qien.nl/wp-content/uploads/2017/10/logo.svg" class="qien-logo" alt="Qien">
+        </a>
+        <nav class="main-nav-list">
+            <!-- list of options or breadcrumbs -->
+        </nav>
+    </div>
+    <div class="header-section-2">
+    </div>
+    <div class="header-section-3">
+        <a href="inlogscherm.html">
+            <img src="image/logout.png" class="log-uit" alt="loguit">
+        </a>
+    </div>
+</header>
+
+<script>
+    // alle medewerkers zien
+    function alleMedewerkers() {
+        var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    var databaseContents = JSON.parse(this.responseText);
+                    var employeeString = "";
+                    var x;
+
+                    for (x = 0; x < databaseContents.length; x++) {
+
+                        employeeString +=
+                            `
+                    <div>
+                    <p>Naam:  ${databaseContents[x].naam}</p>
+                    <p>Adres: ${databaseContents[x].adres}</p>
+                    <p>Woonplaats: ${databaseContents[x].woonplaats}</p>
+                    <p>Postcode: ${databaseContents[x].postcode}</p>
+                    <p>Geboorte datum: ${databaseContents[x].geboorteDatum}</p>
+                    <p>Telefoon nummer: ${databaseContents[x].telefoonNummer}</p>
+                    <p>Email: ${databaseContents[x].emailadres}</p>
+                    <hr>
+                    </div>
+                    `
+                    }
+                }
+                document.getElementById("gettingalltheemployees").innerHTML = employeeString;
+            }
+            xhr.open("GET", "http://173.212.208.199:1337/api/trainee/all", true)
+            xhr.send();
+    }
+</script>
+
+<body onload=alleMedewerkers()>
+    <div class="container">
+        <p><i><a href="https://www.qien.nl/">Qien > </a>
+            <a href="inlogscherm.html"> Log in > </a> 
+           <a href= "admin.html"> Admin overzicht</a> </i></p>
+    </div>
+    <section>
+        <div class="container">
+            <h1>Personeel</h1>
+        </div>
+    </section>
+    <section class ="container">
+        <div class="dashboard">
+            <div id="gettingalltheemployees"></div>
+            
+        </div>
+    </section>
+
+
+
+
+</body>
+<footer>
+    <div class="container">
+        <small>© 2020 Team1 - Het beste Team </small> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" title="Contact">Contact
+            Qien</a>
+    </div>
+</footer>
+
+</html>

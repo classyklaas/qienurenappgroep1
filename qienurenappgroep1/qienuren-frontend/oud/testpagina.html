@@ -1,0 +1,21 @@
+<div class="test" onload="getUrenformulier(116)"></div>
+<div class="test2"></div>
+<script>
+
+function getUrenformulier(id) {
+    var xhr =new XMLHttpRequest();
+ 
+    xhr.onreadystatechange = function() {
+      if (this.readyStatev== 4) {
+        var obj = JSON.parse(this.responseText)
+        localStorage.setItem('statusgoedkeuring', obj.status_goedkeuring)
+        localStorage.setItem('id', obj.id)
+        document.getElementById("test").innerHTML = obj.status_goedkeuring;
+        document.getElementById("test2").innerHTML = localStorage.getItem('statusgoedkeuring');
+      }
+    };
+    xhr.open("GET", "http://173.212.208.199:1337/api/urenformulier/116", true);
+    xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+    xhr.send();   
+  }
+</script>

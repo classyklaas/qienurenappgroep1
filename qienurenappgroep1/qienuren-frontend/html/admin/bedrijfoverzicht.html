@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+  <link rel="icon" href="../../image/logo-qien-zonder-tekst-ronder.png">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <!-- Eigen CSS -->
+  <link rel="stylesheet" href="../../css/Stylesheet.css" />
+  <!-- ../../css/Stylesheet.css -->
+
+  <title>Overzicht van bedrijven</title>
+
+  <!-- Eigen JavaScript -->
+  <script src="../../js/javascript.js"></script>
+  <script>
+
+    function emailenMaar() {
+      annulerenKnopVerwijderen();
+      var xhr = new XMLHttpRequest();
+      var obj = {};
+      obj.emailTo = document.getElementById("emailNaar").value;
+      obj.subject = document.getElementById("onderwerpregel").value;
+      obj.text = document.getElementById("bodyVanEmail").value;
+      var json = JSON.stringify(obj);
+      xhr.open("POST", "http://173.212.208.199:1337/mail", true);
+      xhr.setRequestHeader("Content-type", "application/json");
+      xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+      xhr.send(json);
+      aanHetVersturen();
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4) {
+          veranderTekstOpEmailknop();
+          setTimeout(paginaReload, 1500);
+        }
+      }
+    }
+
+    function annulerenKnopVerwijderen() {
+      var x = document.getElementById("annuleerknop");
+      x.style.display = "none";
+    }
+    function aanHetVersturen() {
+      var element = document.getElementById("emailknop");
+      element.value = "Aan het versturen...";
+    }
+
+    function veranderTekstOpEmailknop() {
+      var element = document.getElementById("emailknop");
+      element.value = "E-mail verstuurd :)";
+    }
+
+    function lijstBedrijven() {
+      var lijst = "";
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4) {
+          var obj = JSON.parse(this.responseText);
+          var x;
+          lijst += `
+                    <table id="overzichttable" class="table-sm overzichtformulieren tableFixHead" cellspacing="0"
+                        width="100%">
+                        <thead>
+                            <tr>
+                            <th class="th-sm">Bedrijven</th>
+                            <th class="th-sm">Profiel</th>
+                        </tr>
+                        </thead><tbody>
+                        `
+          for (x = 0; x < obj.length; x++) {
+            var bedrijfsNaam = `<i>Naam: </i>` + `<strong>${obj[x].bedrijfsNaam}</strong>` + "<br>    " + `<i>Contactpersoon: </i>` + `<strong>${obj[x].contactPersoon}</strong>`;
+            var userId = obj[x].userId;
+            if (obj[x].bedrijfsNaam != undefined && obj[x].contactPersoon != undefined && obj[x].voornaam != "Admin") {
+              lijst +=
+                ` <tr>
+                                      <td>${bedrijfsNaam}</td>
+                                      <td><button onclick="bedrijfsGegevens('${userId}')" 
+                                        class="button3-sm" data-toggle="modal" data-target="#myModal1">bekijken</button></td>
+  
+                                </tr>
+                                `
+            }
+          }
+        }
+        lijst += `</tbody></table>`;
+
+        document.getElementById("lijst-bedrijven").innerHTML = lijst;
+
+      }
+      xhr.open("GET", "http://173.212.208.199:1337/api/bedrijf/all", true);
+      xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+      xhr.send();
+    }
+
+    function bedrijfsGegevens(userId) {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function () {
+        if (this.readyState == 4) {
+          var databaseContents = JSON.parse(this.responseText);
+          var employeeString = "";
+          var werknemers = "";
+          for (var x = 0; x < databaseContents.lijstGebruikers.length; x++) {
+            werknemers += databaseContents.lijstGebruikers[x].voornaam + " " + databaseContents.lijstGebruikers[x].achternaam + `<br>`;
+          }
+
+          employeeString +=
+            `
+                        <div>
+                            <h5>Profiel bedrijf</h5>
+                        <table class="enkeleGebruikerTabelLaden">
+                            <tr>
+                            <th>Naam Bedrijf: </th>
+                            <td>${databaseContents.bedrijfsNaam}</td>
+                            </tr>
+                            <tr>
+                            <th>Contactpersoon: </th>
+                            <td>${databaseContents.contactPersoon}</td>
+                            </tr>
+                            <tr>
+                            <th>Email: </th>
+                            <td>${databaseContents.email}</td>
+                            </tr>
+                            <tr>
+                            <th>Telefoonnummer: </th>
+                            <td>${databaseContents.telefoonNummer}</td>
+                            </tr>
+                            <tr>
+                            <th>Adres: </th>
+                            <td>${databaseContents.adres + " " + databaseContents.evtToevoeging}</td>
+                            </tr>
+                            <tr>
+                            <th>Postcode: </th>
+                            <td>${databaseContents.postcode}</td>
+                            </tr>
+                            <tr>
+                            <th>Plaats: </th>
+                            <td>${databaseContents.woonplaats}</td>
+                            </tr>
+                            <tr>
+                            <th>Werknemers: </th>
+                            <td>${werknemers} </td>
+                            </tr>
+                        </table>
+                        </div>
+                            `
+          document.getElementById("persoonsgegevens").innerHTML = employeeString;
+          document.getElementById("persoonsmail").innerHTML = `<input type="text" size="35" value=${databaseContents.email} id="emailNaar" disabled>`;
+
+        }
+      }
+      xhr.open("GET", "http://173.212.208.199:1337/api/bedrijf/" + userId, true);
+      console.log("werkt dit?");
+      xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+      xhr.send();
+    }
+
+  </script>
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+    crossorigin="anonymous"></script>
+
+</head>
+
+<body onload="lijstBedrijven(), alleGebruikersModal(), alleBedrijvenModal(), loginAuthAdmin()">
+  <div class="modal fade" id="myModal1" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div id="showNaam-modal">
+          <div id="persoonsgegevens"></div>
+        </div>
+        <div class="modal-body">
+          <div id="alleGebruikers"></div>
+          <form>
+            <div id="persoonsmail"></div>
+            <br>
+            <input type="text" size="35" placeholder="Onderwerpregel" id="onderwerpregel">
+            <br>
+            <br>
+            <textarea type="text" placeholder="Bericht" id="bodyVanEmail" rows="10" cols="100"></textarea>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <input type=button id="emailknop" class="button3" onclick=emailenMaar() value="Verstuur e-mail">
+          <button type="button" id="annuleerknop" class="btn btn-default button2" onclick=""
+            data-dismiss="modal">Annuleren</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <!-- Qien Logo -->
+    <nav class="navbar navbar navbar-light navbar-expand-sm">
+      <a class="navbar-brand" href="https://www.qien.nl">
+        <img src="../../image/qienlogowit.png" width="75" height="75" alt="Qien Logo">
+      </a>
+      <!-- Profiel menu -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-list-4"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbar-list-4">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img src="../../image/adminpic.PNG" width="85" height="85" class="rounded-circle">
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item"><b>
+                  Admin
+                </b></a>
+              <hr>
+              <a onclick="logout()" class="dropdown-item" href="#">Uitloggen</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+      </div>
+    </nav>
+    <!-- Breadcrumb -->
+    <div>
+      <ul class="breadcrumb">
+        <li><a href="admin.html">Admin Home</a></li>
+        <li>Overzicht bedrijven</li>
+      </ul>
+    </div>
+  </header>
+
+
+  <!-- Main content -->
+  <main>
+    <div class="container">
+      <div class="row">
+        <!-- sidebar -->
+        <div class="col-sm-3">
+          <div class="sidebar">
+            <button class="button2" onclick="window.location.href='bedrijfnieuw.html'">Nieuw
+              bedrijf</button>
+            <button class="button2" onclick="window.location.href='bedrijfaanpassen.html'">Bedrijf
+              aanpassen</button>
+          </div>
+        </div>
+        <!-- main content -->
+        <div class="col-lg-9">
+          <div class="content">
+            <section>
+              <div id="lijst-bedrijven"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+
+      © 2020 Team 1&nbsp;&nbsp;&nbsp;
+      <a href="https://www.qien.nl/contact/">Contact</a>&nbsp;&nbsp;&nbsp;
+      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> Qien.nl</a>
+
+    </div>
+  </footer>
+</body>
+
+</html>

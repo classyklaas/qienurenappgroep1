@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+    <link rel="icon" href="../../image/logo-qien-zonder-tekst-ronder.png">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- Eigen CSS -->
+    <link rel="stylesheet" href="../../css/Stylesheet.css" />
+    <!-- ../../css/Stylesheet.css -->
+
+    <title>Gebruikers gegevens wijzigen</title>
+
+    <!-- Eigen JavaScript -->
+    <script src="../../js/javascript.js"></script>
+
+    <script>
+        function alleGebruikers() {
+            var employeeString = "";
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    var databaseContents = JSON.parse(this.responseText);
+
+                    var x;
+                    var c;
+                    var select = document.getElementById("selectNumber");
+
+                    for (x = 0; x < databaseContents.length; x++) {
+                        for (c = 0; c < databaseContents[x].roles.length; c++) {
+
+                            if (databaseContents[x].roles[c].name == "ROLE_ADMIN" || databaseContents[x].roles[c].name == "ROLE_BEDRIJF") {
+
+                            } else {
+
+                                var el = document.createElement("option");
+                                el.textContent = databaseContents[x].voornaam + " " + databaseContents[x].achternaam;
+                                el.value = databaseContents[x].userId;
+                                select.appendChild(el);
+
+                            }
+                        }
+                    }
+                }
+            }
+            xhr.open("GET", "http://173.212.208.199:1337/api/admin/all-users", true)
+            xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+            xhr.send();
+        }
+
+        function gegevensAanpassen() {
+            // change details - want to get ID automatically but don't know how to take persistent data from one page to another, will fix
+            var xhr = new XMLHttpRequest();
+            var id = document.getElementById("selectNumber").value;
+            var obj = {};
+            obj.voornaam = document.getElementById("nieuwVoorNaam").value;
+            obj.achternaam = document.getElementById("nieuwAchterNaam").value;
+            obj.adres = document.getElementById("nieuwAdres").value;
+            obj.evtToevoeging = document.getElementById("nieuwEvtToevoeging").value;
+            obj.postcode = document.getElementById("nieuwPostcode").value;
+            obj.woonplaats = document.getElementById("nieuwWoonplaats").value;
+            obj.geboorteDatum = document.getElementById("nieuwGeboorteDatum").value;
+            obj.telefoonNummer = document.getElementById("nieuwTelefoonNummer").value;
+            obj.emailadres = document.getElementById("nieuwEmailadres").value;
+            objJSON = JSON.stringify(obj);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    console.log("the details have been changed!")
+                }
+            }
+            xhr.open("PUT", "http://173.212.208.199:1337/api/users/" + id, true);
+            xhr.setRequestHeader("Content-type", "application/json")
+            xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+            xhr.send(objJSON);
+            document.getElementById("modal-aanpassen").innerHTML = "Gebruiker aangepast";
+            $('#myModal-aanpassen').modal('show');
+            setTimeout(paginaTerug, 2000);
+        }
+
+    </script>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+    <script>
+        //JQuery, checkbox uncheck na sluiten van modal
+        $(function () {
+            $('#myModal4').on('hidden.bs.modal', function (e) {
+                $("#myModal4").find('input:checkbox').prop('checked', false);
+                $("#myModal4").find('#deleteGebruiker').prop('disabled', true);
+            })
+        });
+
+            //disable knop wanneer textarea leeg is
+            $(document).ready(function () {
+                $("#aanpas-knop").attr('disabled', true);
+
+                $('input[type="text"],input[type="password"],input[type="date"]').on('keyup', function () {
+                    var text_value = $(this).val();
+      
+                    if (text_value != '') {
+                        $("#aanpas-knop").attr('disabled', false);
+                    } else {
+                        var keyCode = event.keyCode || event.which;
+                        if (keyCode == '9') {}
+                        else{
+                        $("#aanpas-knop").attr('disabled', true);
+                    }
+                    }
+                });
+            });
+        
+    </script>
+</head>
+
+<body
+    onload="alleGebruikers(), alleGebruikersModal(), alleBedrijvenModal(), loginAuthAdmin(), GebruikersVerwijderenModal()">
+    <!-- Modal bevestiging -->
+    <div>
+        <div class="modal fade" id="myModal-aanpassen" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>
+                                <div id=modal-aanpassen></div>
+                            </b></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal bedrijf koppelen -->
+    <div class="modal fade" id="myModal3" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Koppel gebruiker aan bedrijf</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body modal-edit">
+                    <select id="selectGebruiker">
+                        <option>Kies een gebruiker</option>
+                    </select>
+                    <select id="selectBedrijf">
+                        <option>Kies een Bedrijf</option>
+                    </select>
+
+                    <input type="button" class="button3-sm" onclick="updateBedrijftoGebruiker()" value="Koppelen"
+                        data-dismiss="modal"><br>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- Modal gebruiker verwijderen -->
+    <div class="modal fade" id="myModal4" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Verwijder gebruiker</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body modal-edit">
+                    <select id="selectVerwijderGebruikermodal">
+                        <option>Kies een gebruiker</option>
+                    </select>
+                    <input type="button" id="deleteGebruiker" class="button3-sm" onclick="deleteGebruiker()"
+                        value="verwijderen" data-dismiss="modal" disabled><br>
+
+                </div>
+                <div class="modal-footer">
+                    <h4>Ik bevestig hierbij dat ik deze gebruiker uit de database verwijder</h4><br>
+                    <input type="checkbox" id="form-check"
+                        onchange="document.getElementById('deleteGebruiker').disabled = !this.checked;" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Header -->
+
+    <header>
+        <!-- Qien Logo -->
+        <nav class="navbar navbar navbar-light navbar-expand-sm">
+            <a class="navbar-brand" href="https://www.qien.nl">
+                <img src="../../image/qienlogowit.png" width="75" height="75" alt="Qien Logo">
+            </a>
+            <!-- Profiel menu -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-list-4"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar-list-4">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="../../image/adminpic.PNG" width="85" height="85" class="rounded-circle">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item"><b>
+                                    Admin
+                                </b></a>
+                            <hr>
+                            <a onclick="logout()" class="dropdown-item" href="#">Uitloggen</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            </div>
+        </nav>
+        <!-- Breadcrumb -->
+        <div>
+            <ul class="breadcrumb">
+                <li><a href="admin.html">Admin Home</a></li>
+                <li><a href="gebruikeroverzicht.html">Overzicht gebruikers</a></li>
+                <li>Gebruiker aanpassen</li>
+            </ul>
+        </div>
+    </header>
+
+
+    <!-- Main content -->
+    <main>
+        <div class="container">
+            <div class="row">
+                <!-- sidebar -->
+                <div class="col-sm-3">
+                    <div class="sidebar">
+                        <input type="button" class="button2" data-toggle="modal" data-target="#myModal3"
+                            value="Koppel gebruiker">
+                        <input type="button" class="button2" data-toggle="modal" data-target="#myModal4"
+                            value="Verwijder gebruiker">
+                        <button class="button1" onclick="window.location.href='gebruikeroverzicht.html'">Terug</button>
+                    </div>
+                </div>
+                <!-- main content -->
+                <div class="col-lg-9">
+                    <div class="content">
+                        <h2>Wijzigen NAW-gegevens</h2>
+                        <div class="body-form">
+                            <form name="type-form">
+                                <div class="inputData">
+                                    <label>Gebruiker</label><select id="selectNumber">
+                                        <option>Kies een gebruiker</option>
+                                    </select><br>
+                                    <label>Voornaam</label><input type="text" id=nieuwVoorNaam><br>
+                                    <label>Achternaam</label><input type="text" id=nieuwAchterNaam><br>
+                                    <label>Adres</label><input type="text" id=nieuwAdres><br>
+                                    <label>Evt. toevoeging</label><input type="text" id=nieuwEvtToevoeging><br>
+                                    <label>Postcode</label><input type="text" id=nieuwPostcode><br>
+                                    <label>Woonplaats</label><input type="text" id=nieuwWoonplaats><br>
+                                    <label>Geboortedatum</label><input type="date" id="nieuwGeboorteDatum"><br>
+                                    <label>Telefoonnummer</label><input type=text id=nieuwTelefoonNummer><br>
+                                    <label>E-mailadres</label><input type=text id=nieuwEmailadres><br>
+                                    <label>Wachtwoord</label><input type=password id=nieuwWachtwoord> <br>
+                                    <br>
+                                </div>
+                                <br>
+                                <input type="button" class="button3" id="aanpas-knop" onclick="gegevensAanpassen()" value="Opslaan">
+                                <br>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+
+            © 2020 Team 1&nbsp;&nbsp;&nbsp;
+            <a href="https://www.qien.nl/contact/">Contact</a>&nbsp;&nbsp;&nbsp;
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> Qien.nl</a>
+
+        </div>
+    </footer>
+</body>
+</html>

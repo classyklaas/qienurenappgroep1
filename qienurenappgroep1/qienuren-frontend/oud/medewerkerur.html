@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/styling.css" />
+    <title>Medewerker Urenregistratie Formulier</title>
+    <script src="../../js/javascript.js"></script>
+
+    <script>
+      function nieuwWerkDag(x, y) {
+        var obj = {};
+        obj.datumDag = document.getElementById("datumDag" + x).value;
+        obj.uren = document.getElementById("uren" + y).value;
+        objJSON = JSON.stringify(obj);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (
+              this.responseText == "Je mag niet meer dan 10 uur per dag werken"
+            ) {
+              alert("Je mag niet meer dan 10 uur per dag werken");
+            } else {
+              var objresponse = JSON.parse(this.responseText);
+              updateWorkDaytoUrenFormulier(objresponse.id);
+            }
+          }
+        };
+        xhr.open("POST", "http://173.212.208.199:1337/api/werkdag/new/", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(objJSON);
+      }
+
+      function werkDagenOverzicht() {
+        var txt = "";
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            var myObj = JSON.parse(this.responseText);
+            txt +=
+              "<table>" +
+              "<th>" +
+              "Datum" +
+              "</th>" +
+              "<th>" +
+              "Uren" +
+              "</th>" +
+              "<th>" +
+              "id" +
+              "</th>";
+            for (x in myObj) {
+              txt +=
+                "<tr>" +
+                "<td>" +
+                myObj[x].datumDag +
+                "</td>" +
+                "<td>" +
+                myObj[x].uren +
+                "</td>" +
+                "<td>" +
+                myObj[x].id +
+                "</td>";
+              txt += "</tr>";
+            }
+            txt += "</table>";
+            document.getElementById("werkdagen").innerHTML = txt;
+          }
+        };
+        xhr.open(
+          "GET",
+          "http://173.212.208.199:1337/api/werkdag/werkdagen",
+          true
+        );
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send();
+      }
+
+      function createUrenFormulier() {
+        var txt = "";
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            var myObj = JSON.parse(this.responseText);
+            txt +=
+              "<table>" +
+              "<th>" +
+              "Datum" +
+              "</th>" +
+              "<th>" +
+              "Uren" +
+              "</th>" +
+              "<th>" +
+              "id" +
+              "</th>";
+            for (x in myObj) {
+              txt +=
+                "<tr>" +
+                "<td>" +
+                myObj[x].datumDag +
+                "</td>" +
+                "<td>" +
+                myObj[x].uren +
+                "</td>" +
+                "<td>" +
+                myObj[x].id +
+                "</td>";
+              txt += "</tr>";
+            }
+            txt += "</table>";
+            document.getElementById("werkdagen").innerHTML = txt;
+          }
+        };
+        xhr.open(
+          "GET",
+          "http://173.212.208.199:1337/api/werkdag/werkdagen",
+          true
+        );
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send();
+      }
+
+      function nieuwUrenFormulier() {
+        var obj = {};
+        obj.jaar = document.getElementById("jaar-formulier").value;
+        obj.maand = document.getElementById("maand-formulier").value;
+        objJSON = JSON.stringify(obj);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4) {
+            var objresponse = JSON.parse(this.responseText);
+            updateUrenFormuliertoGebruiker(objresponse.id);
+          }
+        };
+        xhr.open(
+          "POST",
+          "http://173.212.208.199:1337/api/urenformulier/new",
+          true
+        );
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(objJSON);
+        alert("Nieuw uren formulier aangemaakt");
+      }
+
+      function updateWorkDaytoUrenFormulier(id) {
+        var obj = {};
+        obj.ufid = document.getElementById("maand-werkdag-formulier").value;
+        obj.wdid = id;
+        objJSON = JSON.stringify(obj);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = new (function () {
+          if (xhr.readyState == 4) {
+            if (
+              this.responseText == "HO STOP JE HEBT TEVEEL GEWERKT DEZE MAAND"
+            ) {
+              alert("HO STOP JE HEBT TEVEEL GEWERKT DEZE MAAND");
+            }
+          }
+        })();
+        xhr.open(
+          "PUT",
+          "http://173.212.208.199:1337/api/urenformulier/" +
+            obj.ufid +
+            "/" +
+            id,
+          true
+        );
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(objJSON);
+      }
+
+      function totaalGewerkteUrenById() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4) {
+            var myObj = JSON.parse(this.responseText);
+            document.getElementById("totaal-uren").innerHTML = myObj;
+          }
+        };
+        xhr.open(
+          "GET",
+          "http://173.212.208.199:1337/api/urenformulier/gewerkteuren/1",
+          true
+        );
+        xhr.send();
+      }
+
+      function getUrenFormulierByMaand() {
+        var txt = "";
+        var xhr = new XMLHttpRequest();
+        var mnd = document.getElementById("maand-overzicht").value;
+        xhr.onreadystatechange = function () {
+          if (this.readyState == 4 && this.status == 200) {
+            var myObj = JSON.parse(this.responseText);
+            txt +=
+              "<table>" +
+              "<th>" +
+              "id" +
+              "</th>" +
+              "<th>" +
+              "totaal" +
+              "</th>" +
+              "<th>" +
+              "Maand" +
+              "</th>" +
+              "<th>" +
+              "Jaar" +
+              "</th>" +
+              "<th>" +
+              "Werkdag" +
+              "</th>";
+            for (x in myObj) {
+              txt +=
+                "<tr>" +
+                "<td>" +
+                myObj[x].id +
+                "</td>" +
+                "<td>" +
+                myObj[x].totaalGewerkteUren +
+                "</td>" +
+                "<td>" +
+                myObj[x].maand +
+                "</td>" +
+                "<td>" +
+                myObj[x].jaar +
+                "</td>" +
+                "<td>" +
+                myObj[x].werkdag[x] +
+                "</td>";
+              txt += "</tr>";
+            }
+            txt += "</table>";
+            document.getElementById("uren-formulier-maand").innerHTML = txt;
+          }
+        };
+        xhr.open(
+          "GET",
+          "http://173.212.208.199:1337/api/urenformulier/permaand/" + mnd,
+          true
+        );
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send();
+      }
+
+      function invulFormulier() {
+        var y = "";
+        var x;
+        for (x = 1; x < 32; x++) {
+          y += `<form><input type="number" id="datumDag${x}" placeholder="dag" min="1" max="31" value="${x}" disabled>
+                <input type="number" id="uren${x}" placeholder="uren" ">
+                <input type=button id="myBtn${x}" onclick="nieuwWerkDag(${x},${x}), disableFunction(${x})" value="opslaan"></form>
+                `;
+        }
+
+        document.getElementById("invulFormulier").innerHTML = y;
+      }
+
+      function disableFunction(x) {
+        document.getElementById("uren" + x).disabled = true;
+      }
+
+      function updateUrenFormuliertoGebruiker(id) {
+        var gid = document.getElementById("gebruiker-formulier").value;
+        var xhr = new XMLHttpRequest();
+        xhr.open(
+          "PUT",
+          "http://173.212.208.199:1337/api/gebruiker/" + gid + "/" + id,
+          true
+        );
+        xhr.send();
+      }
+
+      function urenFormulierenPerJaar() {
+        var xhr = new XMLHttpRequest();
+        var id = document.getElementById("gebruiker-formulier").value;
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4) {
+            var urenformulieren = [];
+            var inhoudDB = JSON.parse(this.responseText);
+            var jaar = document.getElementById("jaar-formulier-selector").value;
+            var x;
+
+            for (x = 0; x < inhoudDB.length; x++) {
+              if (inhoudDB[x].jaar == jaar) {
+                urenformulieren.push(inhoudDB[x]);
+              }
+            }
+            createMaandSelector(urenformulieren);
+          }
+        };
+        xhr.open(
+          "GET",
+          "http://173.212.208.199:1337/api/gebruiker/" +
+            id +
+            "/urenformulieren",
+          true
+        );
+        xhr.send();
+      }
+
+      function createMaandSelector(urenformulieren) {
+        var maandSelect = document.getElementById("maand-werkdag-formulier");
+        var x;
+        for (x = 0; x < urenformulieren.length; x++) {
+          var opt = document.createElement("option");
+          opt.value = urenformulieren[x].id;
+          opt.innerHTML = urenformulieren[x].maand;
+          maandSelect.appendChild(opt);
+        }
+      }
+
+      function createGebruikersSelector() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4) {
+            var gebruikers = JSON.parse(this.responseText);
+            var newSelect = document.getElementById("gebruiker-formulier");
+            var x;
+
+            for (x = 0; x < gebruikers.length; x++) {
+              if (gebruikers[x].rol == "MEDEWERKER") {
+                var opt = document.createElement("option");
+                opt.value = gebruikers[x].id;
+                opt.innerHTML = gebruikers[x].naam;
+                newSelect.appendChild(opt);
+              }
+            }
+          }
+        };
+        xhr.open(
+          "GET",
+          "http://173.212.208.199:1337/api/admin/all-users",
+          true
+        );
+        xhr.send();
+      }
+    </script>
+  </head>
+  <header class="main-header">
+    <div class="header-section-1">
+      <a ref="http://wwww.qien.nl">
+        <img
+          src="https://www.qien.nl/wp-content/uploads/2017/10/logo.svg"
+          class="qien-logo"
+          alt="Qien"
+        />
+      </a>
+      <nav class="main-nav-list">
+        <!-- list of options or breadcrumbs -->
+      </nav>
+    </div>
+    <div class="header-section-2"></div>
+    <div class="header-section-3">
+      <a href="medewerkerprofiel.html">
+        <img src="image/profilepic.png" class="profile-pic" alt="profile" />
+      </a>
+    </div>
+  </header>
+  <body
+    onload="invulFormulier(),createGebruikersSelector(),urenFormulierenPerJaar()"
+  >
+    <div id="sidebar-left">
+      <div class="left-container">
+        <button onclick="window.location.href='medewerkerur.html'">
+          Uren invoeren/bewerken
+        </button>
+        <button
+          onclick="window.location.href='medewerkeruroverzicht.html'"
+          disabled
+        >
+          Historie Uren Registratie
+        </button>
+      </div>
+    </div>
+    <div id="main">
+      <div class="container">
+        <nav class="main-nav-list">
+          <i>
+            <a href="https://www.qien.nl/">Qien</a>>
+            <a href="inlogscherm.html">Log in</a>>
+            <a href="medewerker.html">Medewerker overzicht</a>> Uren Invoeren
+          </i>
+        </nav>
+        <h1>THIS PAGE IS OUTDATED - HEAD TO URENFORMULIER PLEASE</h1>
+        <h1>Huidige maand: Augustus</h1>
+        <p>Totaal gewerkte uren deze maand: <a id="totaal-uren"></a></p>
+        <select name="maand-formulier" id="maand-formulier">
+          <option value="0">januari</option>
+          <option value="1">februari</option>
+          <option value="2">maart</option>
+          <option value="3">april</option>
+          <option value="4">mei</option>
+          <option value="5">juni</option>
+          <option value="6">juli</option>
+          <option value="7">augustus</option>
+          <option value="8">september</option>
+          <option value="9">oktober</option>
+          <option value="10">november</option>
+          <option value="11">december</option>
+        </select>
+        <select name="jaar-formulier" id="jaar-formulier">
+          <option value="2020">2020</option>
+          <option value="2019">2019</option>
+          <option value="2018">2018</option>
+        </select>
+        <input
+          type="button"
+          onclick="nieuwUrenFormulier()"
+          value="Nieuw Uren Formulier"
+        />
+
+        <h2>Verbind urenformulier met gebruiker</h2>
+        <input type="text" id="gid" placeholder="gebruikerid" />
+        <input type="text" id="ufid2" placeholder="formulierid" />
+        <input
+          type="button"
+          onclick="updateUrenFormuliertoGebruiker()"
+          value="versturen"
+        />
+
+        <div class="dashboard">
+          <form>
+            <div class="container">
+              <h2>Uren Formulier</h2>
+              <select
+                name="gebruiker-formulier"
+                id="gebruiker-formulier"
+              ></select>
+              <select
+                name="jaar-formulier-selector"
+                id="jaar-formulier-selector"
+                onchange="urenFormulierenPerJaar()"
+              >
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+              </select>
+              <select
+                name="maand-werkdag-formulier"
+                id="maand-werkdag-formulier"
+              ></select>
+              <div id="invulFormulier"></div>
+            </div>
+          </form>
+        </div>
+        <div class="container">
+          <h2>Werkdagen in database</h2>
+          <input type="button" onclick="werkDagenOverzicht()" value="show" />
+          <div id="werkdagen"></div>
+        </div>
+        <div class="container">
+          <h2>Urenformulieren in database per maand</h2>
+          <select
+            name="maand-overzicht"
+            onclick="getUrenFormulierByMaand()"
+            id="maand-overzicht"
+          >
+            <option value="0">januari</option>
+            <option value="1">februari</option>
+            <option value="2">maart</option>
+            <option value="3">april</option>
+            <option value="4">mei</option>
+            <option value="5">juni</option>
+            <option value="6">juli</option>
+            <option value="7">augustus</option>
+            <option value="8">september</option>
+            <option value="9">oktober</option>
+            <option value="10">november</option>
+            <option value="11">december</option>
+          </select>
+          <div id="uren-formulier-maand"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <footer>
+    <div class="container">
+      <small>© 2020 Team1 - Het beste Team </small>
+    </div>
+  </footer>
+</html>

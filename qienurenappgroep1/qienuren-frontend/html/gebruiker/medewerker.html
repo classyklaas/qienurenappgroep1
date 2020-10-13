@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+    <link rel="icon" href="../../image/logo-qien-zonder-tekst-ronder.png">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- Eigen CSS -->
+    <link rel="stylesheet" href="../../css/Stylesheet.css" />
+    <!-- ../../css/Stylesheet.css -->
+
+    <title>Gebruiker Home</title>
+
+    <!-- Eigen JavaScript -->
+    <script src="../../js/javascript.js"></script>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+
+    <script>
+
+        var naam;
+
+        function ziekMelden() {
+            var date = new Date();
+            var datumDag = date.getUTCDate();
+            var urenFormulier = {};
+            var months = ["JANUARI", "FEBRUARI", "MAART", "APRIL", "MEI", "JUNI", "JULI", "AUGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DECEMBER"];
+            urenFormulier.maand = months[date.getMonth()];
+            urenFormulier.jaar = date.getFullYear();
+            urenFormulierJSON = JSON.stringify(urenFormulier);
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", "http://173.212.208.199:1337/api/urenformulier/ziekmelden/" + localStorage.getItem("userId") + "/" + datumDag, true);
+            xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(urenFormulierJSON);
+            ziekMailenMaar();
+        }
+
+        function ziekMailenMaar() {
+            var xhr = new XMLHttpRequest();
+            var obj = {};
+            obj.emailTo = "hamid.haloti@qien.nl";
+            obj.subject = `${naam} is ziek vandaag`;
+            obj.text = `Beste Hamid,
+
+${naam} is ziek en komt niet op werk vandaag. Dit is automatisch opgeslagen in het systeem.
+
+Met vriendelijke groeten,
+
+
+Groep 1`;
+            var json = JSON.stringify(obj);
+            xhr.open("POST", "http://173.212.208.199:1337/mail", true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+            xhr.send(json);
+        }
+
+        function getNaamGebruiker() {
+            var xhr = new XMLHttpRequest();
+            var obj = {};
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4) {
+                    var obj = JSON.parse(this.responseText);
+                    naam = obj.voornaam + " " + obj.achternaam;
+                }
+            }
+            xhr.open("GET", "http://173.212.208.199:1337/api/gebruiker/userid/" + localStorage.getItem("userId"), true);
+            xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+            xhr.send();
+        }
+
+
+    </script>
+
+</head>
+
+<body onload="gebruikersnaam(), getNaamGebruiker(), vandaag()">
+    <!-- Header -->
+    <div class="modal fade" id="myModal4" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Ziek melden?</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    Datum ziekmelding:
+                    <div id="vandaag2"></div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" class="button3"
+                    onclick="ziekMelden()" value="Bevestigen"
+                    data-dismiss="modal" data-toggle="modal" data-target="#myModal"><br>
+                    <input type="button" class="button2"
+                    value="Annuleren" data-dismiss="modal"><br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ziekmelden bevestiging modal -->
+    <div>
+    <div class="modal fade" id="myModal" role="dialog">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p><b>Veel Beterschap! We hebben je bericht doorgestuurd naar je leidinggevende.</b></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <header>
+        <!-- Qien Logo -->
+        <nav class="navbar navbar navbar-light navbar-expand-sm">
+            <a class="navbar-brand" href="https://www.qien.nl">
+                <img src="../../image/qienlogowit.png" width="75" height="75"
+                    alt="Qien Logo">
+            </a>
+            <!-- Profiel menu -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-list-4"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar-list-4">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="../../image/gebruikerpic.PNG" width="85" height="85" class="rounded-circle">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="medewerkerprofiel.html"><b><div id="gebruikersnaam"></div></b></a><hr>
+                            <a onclick="logout()" class="dropdown-item" href="#">Uitloggen</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            </div>
+        </nav>
+        <!-- Breadcrumb -->
+        <div>
+            <ul class="breadcrumb">
+                <li>Dashboard</li>
+            </ul>
+        </div>
+    </header>
+
+
+    <!-- Main content -->
+    <main>
+        <div class="container">
+            <div class="row">
+                <!-- sidebar -->
+                <div class="col-sm-3">
+                    <div class="sidebar">
+                        <button class="button2" onclick="window.location.href='urenformulier.html'">Urenregistratie</button>
+                        <button class="button2" onclick="window.location.href='medewerkeruroverzicht.html'">Historie</button>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                        <input type="button" class="button3" data-toggle="modal"
+                            data-target="#myModal4" value="Ziek melden">
+                    </div>
+                </div>
+                <!-- main content -->
+                <div class="col-lg-9" style="text-align:center">
+                    <div class="content">
+                        <section>
+                           <h5><div id="gebruikersnaam2"></div></h5>
+                           <div id="vandaag"></div>
+                           <hr>
+                           <img src="../../image/clock.png" width=400px alt="clock" title="Qien Uren App">
+                            <div class="dashboard">
+                                <!-- <h2>Registratie deze periode</h2><br>
+                                <ul style="list-style-type:none;">
+                                    <li>Aantal gewerkte uren: 0</li><br>
+                                    <li>Aantal overuren: 0</li><br>
+                                    <li>Aantal vakante-uren: 0</li><br>
+                                    <li>Aantal ziekte-uren: 0</li><br>
+                                </ul> -->
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            
+                © 2020 Team 1&nbsp;&nbsp;&nbsp;
+                <a href="https://www.qien.nl/contact/">Contact</a>&nbsp;&nbsp;&nbsp;
+                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> Qien.nl</a>
+            
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

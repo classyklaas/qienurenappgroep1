@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+    <link rel="icon" href="https://www.qien.nl/wp-content/uploads/2017/10/logo.svg">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- Eigen CSS -->
+    <link rel="stylesheet" href="../../css/Stylesheet.css" />
+    <!-- ../../css/Stylesheet.css -->
+
+    <title>Profiel</title>
+
+    <!-- Eigen JavaScript -->
+    <script src="../../js/javascript.js"></script>
+    <script>
+        function persoonsGegevens() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4) {
+                    var databaseContents = JSON.parse(this.responseText);
+                    var employeeString = "";
+                    employeeString +=
+                        `
+                            <div>
+                            <h4 class="alignleft">Naam:</h4><p class="alignright"> ${databaseContents.voornaam + " " + databaseContents.achternaam}</p><div style="clear: both;"></div>
+                            <h4 class="alignleft">Email:</h4><p class="alignright"> ${databaseContents.email}</p><div style="clear: both;"></div>
+                            <h4 class="alignleft">Geboortedatum:</h4><p class="alignright"> ${databaseContents.geboorteDatum}</p><div style="clear: both;"></div>
+                            <h4 class="alignleft">Telefoonnummer:</h4><p class="alignright"> ${databaseContents.telefoonNummer}</p><div style="clear: both;"></div>
+                            <h4 class="alignleft">Adres:</h4><p class="alignright"> ${databaseContents.adres + " " + databaseContents.evtToevoeging}</p><div style="clear: both;"></div>
+                            <h4 class="alignleft">Postcode:</h4><p class="alignright"> ${databaseContents.postcode}</p><div style="clear: both;"></div>
+                            <h4 class="alignleft">Woonplaats:</h4><p class="alignright"> ${databaseContents.woonplaats}</p><div style="clear: both;"></div>
+                            <h4 class="alignleft">Opdrachtgever:</h4><p class="alignright">${databaseContents.opdrachtgever}</p><div style="clear: both;"></div>
+                            </div>
+                            `
+                    document.getElementById("persoonsgegevens").innerHTML = employeeString;
+                }
+            }
+            xhr.open("GET", "http://173.212.208.199:1337/api/users/" + localStorage.getItem("userId"), true);
+            console.log("werkt dit?");
+            xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+            xhr.send();
+        }
+
+        function gegevensAanpassen() {
+            // change details - want to get ID automatically but don't know how to take persistent data from one page to another, will fix
+            var xhr = new XMLHttpRequest();
+            var id = document.getElementById("employeeID").value;
+            var obj = {};
+            obj.naam = document.getElementById("nieuwNaam").value;
+            obj.adres = document.getElementById("nieuwAdres").value;
+            obj.evtToevoeging = document.getElementById("nieuwEvtToevoeging").value;
+            obj.postcode = document.getElementById("nieuwPostcode").value;
+            obj.woonplaats = document.getElementById("nieuwWoonplaats").value;
+            obj.geboorteDatum = document.getElementById("nieuwGeboorteDatum").value;
+            obj.telefoonNummer = document.getElementById("nieuwTelefoonNummer").value;
+            obj.emailadres = document.getElementById("nieuwEmailadres").value;
+            objJSON = JSON.stringify(obj);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    console.log("the details have been changed!")
+                }
+            }
+            xhr.open("PUT", "http://173.212.208.199:1337/api/gebruiker/changedetails/" + id, true);
+            xhr.setRequestHeader("Content-type", "application/json", "Authorization", localStorage.getItem("token"))
+            xhr.send(objJSON);
+        }
+
+    </script>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+</head>
+
+<body onload="persoonsGegevens(), gebruikersnaam()" >
+    <!-- Modal bevestiging -->
+    <div>
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Profiel aangepast</b></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal uren overzicht -->
+    <div class="modal fade" id="myModal2" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Bewerk mijn profiel</h3>
+                </div>
+                <div class="modal-body">
+                    Gebruiker ID<br>
+                    <input type=text id=employeeID placeholder="temp"><br>
+                    Naam<br>
+                    <input type=text id=nieuwNaam><br>
+                    Adres<br>
+                    <input type="text" id=nieuwAdres><br>
+                    Evt. toevoeging<br>
+                    <input type="text" id=nieuwEvtToevoeging><br>
+                    Postcode<br>
+                    <input type="text" id=nieuwPostcode><br>
+                    Woonplaats<br>
+                    <input type="text" id=nieuwWoonplaats><br>
+                    Geboortedatum<br>
+                    <input type="text" id=nieuwGeboorteDatum><br>
+                    Telefoonnummer<br>
+                    <input type=text id=nieuwTelefoonNummer><br>
+                    E-mailadres <br>
+                    <input type=text id=nieuwEmailadres><br>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default button3" onclick="gegevensAanpassen()"
+                            data-dismiss="modal" data-toggle="modal" data-target="#myModal">Bevestigen</button>
+                        <button type="button" class="btn btn-default button2" onclick="enableTable()"
+                            data-dismiss="modal">Annuleren</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Header -->
+    <header>
+        <!-- Qien Logo -->
+        <nav class="navbar navbar navbar-light navbar-expand-sm">
+            <a class="navbar-brand" href="https://www.qien.nl">
+                <img src="https://www.qien.nl/wp-content/uploads/2017/10/logo.svg" width="75" height="75"
+                    alt="Qien Logo">
+            </a>
+            <!-- Profiel menu -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-list-4"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar-list-4">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="../../image/profilepic.PNG" width="85" height="85" class="rounded-circle">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="traineeprofiel.html"><b>
+                                    <div id="gebruikersnaam"></div>
+                                </b></a>
+                            <hr>
+                            <a class="dropdown-item" onclick="logout()" href="#">Uitloggen</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            </div>
+        </nav>
+        <!-- Breadcrumb -->
+        <div>
+            <ul class="breadcrumb">
+                <li><a href="trainee.html">Trainee Home</a></li>
+                <li>Profiel Pagina</li>
+            </ul>
+        </div>
+    </header>
+
+
+    <!-- Main content -->
+    <main>
+        <div class="container">
+            <div class="wide-row">
+                <h1>
+                    <h2>Persoonlijke Informatie</h2>
+                </h1>
+            </div>
+            <div class="row">
+                <!-- sidebar -->
+                <div class="col-sm-3">
+
+                </div>
+                <!-- main content -->
+                <div class="col-lg-6">
+                    <div class="profiel">
+                        <div id="persoonsgegevens"></div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="wide-row">
+                        <button class="btn btn-info btn-lg button3" data-toggle="modal" data-target="#myModal2">Profiel
+                            bewerken</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="page-footer font-small footer-page">
+        <div class="container">
+            <div class="row footer-content">
+
+                <div class="col">
+                    <b>Bedrijfsinformatie</b><br>
+                    <br>
+                    <a href="https://www.qien.nl/over-ons/">Over Ons</a><br>
+                    <a href="https://www.qien.nl/contact/">Contact</a><br>
+                </div>
+                <div class="col">
+                    <b>Contact</b><br>
+                    <br>
+                    Qien BV<br>
+                    Atoomweg 350<br>
+                    3542 AB Utrecht<br>
+                    030-7514777<br>
+                    info@qien.nl<br>
+                </div>
+            </div>
+            <!-- Copyright -->
+            <div class="footer-copyright py-3">
+                <hr style="background-color:white">
+                © 2020 Team 1:
+                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> Qien.nl</a>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

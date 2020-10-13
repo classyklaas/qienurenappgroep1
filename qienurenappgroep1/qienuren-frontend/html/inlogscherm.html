@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+    <link rel="icon" href="../image/logo-qien-zonder-tekst-ronder.png">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- Eigen CSS -->
+    <link rel="stylesheet" href="../css/Stylesheet.css" />
+    <!-- ../../css/Stylesheet.css -->
+
+    <title>Log in</title>
+
+    <!-- Eigen JavaScript -->
+    <script src="../js/javascript.js"></script>
+    <script type="text/javascript" src=""></script>
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+    <script>
+        const submitLogInHandler = () => {
+            $(document).ready(() => {
+                let loginSubmitAction = () => {
+                    let obj = {};
+                    obj.email = document.getElementById("email").value;
+                    obj.password = document.getElementById("password").value;
+                    objJSON = JSON.stringify(obj);
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = () => {
+                        var myToken = xhr.getResponseHeader("Authorization");
+                        var myUserId = xhr.getResponseHeader("userId");
+                        var myUserRole = xhr.getResponseHeader("userRole");
+
+                        if (myToken && myUserId && myUserRole != null) {
+                            localStorage.setItem("token", myToken);
+                            localStorage.setItem("userId", myUserId);
+                            localStorage.setItem("userRole", myUserRole);
+                        }
+
+                        if (myUserRole == "[ROLE_ADMIN]") {
+                            window.location.href = "./admin/admin.html";
+                        }
+                        if (myUserRole == "[ROLE_MEDEWERKER]") {
+                            window.location.href = "./gebruiker/medewerker.html";
+                        }
+                        if (myUserRole == "[ROLE_TRAINEE]") {
+                            window.location.href = "./gebruiker/medewerker.html";
+                        }
+                        if (myUserRole == "[ROLE_BEDRIJF]") {
+                            window.location.href = "./bedrijf/bedrijfhome.html";
+                        }
+                    };
+                    xhr.open("POST", "http://173.212.208.199:1337/api/login", true);
+                    xhr.setRequestHeader("Content-Type", "application/json");
+
+                    xhr.send(objJSON);
+                };
+                loginSubmitAction();
+            });
+        };
+    </script>
+</head>
+<section id="achtergrondbeeld">
+
+    <body class="body">
+        <!-- Header -->
+        <header>
+            <!-- Qien Logo -->
+            <nav class="navbar navbar navbar-light navbar-expand-sm">
+                <a class="navbar-brand" href="https://www.qien.nl">
+                    <img src="../image/qienlogowit.png" width="75" height="75" alt="Qien Logo">
+                </a>
+            </nav>
+        </header>
+
+
+        <!-- Main content -->
+        <main>
+            <div class="container">
+                <div id="main">
+                <div class="row">
+                    <!-- left -->
+                    <div class="col-sm-4">
+                        <div>
+                        </div>
+                    </div>
+                    <!-- center -->
+                    <div class="col-sm-4">
+                        <div class="login">
+                            <p>
+                            <h2>Inloggen</h2>
+                            <b>E-mailadres<br> </b><input type=email id=email><br>
+                            <b>Wachtwoord<br> </b><input type=password id=password><br>
+                            </p>
+                            <input type="button" class="button3" onclick="submitLogInHandler()" value="Log In" />
+                            <br>
+                        </div>
+                    </div>
+                    <!-- right -->
+                    <div class="col-sm-4">
+                        <div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </main>
+
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                
+                    © 2020 Team 1&nbsp;&nbsp;&nbsp;
+                    <a href="https://www.qien.nl/contact/">Contact</a>&nbsp;&nbsp;&nbsp;
+                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> Qien.nl</a>
+                
+            </div>
+        </footer>
+</section>
+</body>
+
+
+</html>
+
+<!--
+     xhr.setRequestHeader("Authorization" , localStorage.getItem("token"));  
+    bij alle XMLHttpRequest deze code toevoegen zodat header token word meegestuurd( NA open() en VOOR send()! ) 
+    nieuwe endpoints postman voor testen(gebruik authorisatie met bearer token van een admin): 
+    medewerker aanmaken =============>  http://173.212.208.199:1337/api/admin/users/addMedewerker  (POST) 
+    admin aanmaken ==================>  http://173.212.208.199:1337/api/admin/users/addAdmin  (POST)
+    opdrachtgever(bedrijf) aanmaken =>  http://173.212.208.199:1337/api/admin/users/addBedrijf  (POST)
+    trainee aanmaken ================>  http://173.212.208.199:1337/api/admin/users/addTrainee (POST)
+    login ===========================>  http://173.212.208.199:1337/api/login (POST)
+    zie alle gebruikers =============>  http://173.212.208.199:1337/api/users  (GET)
+zie individuele gebruiker(userId) ===>  http://173.212.208.199:1337/api/users/<String userId invullen>   (mag alleen admin/eigen account (bearer 1 van deze 2 gebruiken))  (GET)
+update individule gebruiker(userId) =>  http://173.212.208.199:1337/api/users/<String userId invullen>   (mag alleen admin/eigen account  (""))      (PUT)           
+
+-->

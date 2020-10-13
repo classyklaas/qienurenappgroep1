@@ -1,0 +1,252 @@
+/* titillium-web-regular - latin */
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
+/*@font-face {
+        /* src: url('../fonts/titillium-web-v8-latin-regular.eot'); /* IE9 Compat Modes */
+        /*src: local('Titillium Web Regular'), local('TitilliumWeb-Regular'),
+        /*  url('../fonts/titillium-web-v8-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+        /*  url('../fonts/titillium-web-v8-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+        /* url('../fonts/titillium-web-v8-latin-regular.woff') format('woff'), /* Modern Browsers */
+        /* url('../fonts/titillium-web-v8-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+        /* url('../fonts/titillium-web-v8-latin-regular.svg#TitilliumWeb') format('svg'); /* Legacy iOS */ 
+    /*font-family: 'Titillium Web';
+    font-style: normal;
+    font-weight: 400;
+    }*/
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+body{
+    font-family: 'Titillium Web';
+    min-width:1400px;
+    
+}
+
+
+
+.main-header {
+    padding: 10px 16px;
+    min-height: 100px;
+    width: 100%;
+    text-align: center;
+    background: #C894F8;
+    color: white;
+    font-size: 12px;
+
+}
+
+.header-section-1{
+    float: left;
+    position: center;
+}
+
+.header-section-2{
+
+}
+
+.header-section-3{
+    float: right;
+
+}
+
+.qien-logo {
+    position: relative;
+    top: 10px;
+    width: 60px;
+    height: 60px;
+
+}
+
+
+.profile-pic {
+    position: relative;
+    right: 50px;
+    height: 80px;
+}
+
+.container {
+    width: 960px;
+    max-width: 100%;
+    padding: 0 40px;
+    margin: 40px auto ;
+    text-align: left;
+}
+
+.left-container {
+    max-width: 100%;
+    padding: 0 40px;
+    margin: 40px auto ;
+    text-align: center;
+}
+
+.dashboard{
+    border-color: #212020;
+    border-style: solid;
+    border-radius: 20px;
+    padding: 10px;
+    text-align: left;
+    min-height: 300px;
+}
+
+.main-login{
+    background-image: url("https://i.imgur.com/SgDsN5x.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    min-height: 639px;
+
+}
+
+.loginbox{
+    border-color: #212020;
+    background-color: white;
+    border-style: solid;
+    border-radius: 20px;
+    padding-top:20px;
+    text-align: center;
+    min-height: 400px;
+    max-width: 400px;
+    margin: auto;
+}
+
+.main-header .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        flex-wrap: wrap;
+}
+
+.body-form{
+    max-width: 300px;
+    padding: 10px;
+    text-align: left;
+
+}
+
+footer{
+    clear:both;
+    width: 100%;
+    background-color: #212020;
+    color: white;
+    padding: 30px;
+}
+
+h1 {
+    margin: 20px;
+    font-size: 36px;
+}
+
+button{
+    border-radius: 30px;
+    text-align: center;
+    height: 50px;
+    width: 150px;
+    margin-top: 10px;
+    border-width: 0px;
+    background-color: #ffffff;
+    font-family: 'Titillium Web';
+    font-weight: bold;
+    font-size: 16px;
+    color: #212020;
+}
+
+button:hover{
+    background-color: #7F4BB7;
+    color: white;
+}
+
+input[type=button] {
+    padding: 5px 5px;
+    background-color: #FBCC2F;
+    font-family: 'Titillium Web';
+    font-weight: bold;
+    color: #000000;
+    border-width: 0px;
+    border-radius: 15px;
+    min-width: 60px;
+    font-size: 12px;
+    margin-top: 10px;
+    cursor: pointer;
+
+}
+
+input[type=button]:hover {
+    background-color: #FFDA5C;
+}
+
+input[type=radio]{
+    display: inline-block;
+}
+
+input[type=text], input[type=password], select {
+
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+label {
+    display: inline-block;
+}
+
+
+
+table {
+    width: 100%;
+    margin: 10px auto;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+tr:nth-child(even){background-color: #f2f2f2;}
+
+tr:hover {background-color: #ddd;}
+
+th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #7F4BB7;
+  color: white;
+}
+
+#sidebar-left{
+    float:left;
+    margin-top: 50px;
+    margin-left: 100px;
+    width:15%;
+    background-color: #949494;
+    border-color: #5E5E5E;
+    border-style: solid;
+    border-radius: 20px;
+    min-height: 300px;
+    min-width: 300px;
+
+
+}
+
+#main{
+    float:left;
+    width:70%;
+    background-color: #ffffff;
+    min-height: 679px;
+    min-width: 1000px;
+
+
+}
+
+#sidebar-left, #main{
+   			
+}
